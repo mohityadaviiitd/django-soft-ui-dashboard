@@ -1,0 +1,152 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %} API Sample {% endblock title %}
+
+<!-- Specific CSS goes HERE -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+
+  <div class="container-fluid py-4"> 
+
+    <div class="row">
+        
+      <div class="col-lg-12 mb-lg-0 mb-4">
+        <div class="card">
+          <div class="card-body p-3">
+            <div class="row">
+              <div class="col-lg-8">
+                <div class="d-flex flex-column h-100">
+                  {% if auth_user.status == True %}
+                  <h5 class="font-weight-bolder">Twitter Room Timeline</h5>
+                  {% else %}
+                  <h5 class="font-weight-bolder">Join any Room to access its timeline.</h5>
+                  {% endif %}
+                  
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    {% if auth_user.status == True %}
+
+    <div class="row">
+
+      <div class="col-md-12 mt-1">
+        <div class="card">
+          <div class="card-header text-center pb-0 px-3">
+          </div>
+          <div class="mb-3">
+          <form action ="{% url 'post_thought' %}" class="sellerform" method="POST">
+            {% csrf_token %}
+            <input type="text" minlength="1" maxlength="200" id="name" class="form-control" name="name" placeholder="max 200 characters"/>
+            <br>
+            <input id='btn1' class="btn btn-primary" value="Post your Thought" type="submit" name="Login" />
+        </form>
+      </div>
+        </div>
+      </div>
+
+    </div>
+
+    
+    
+      {% for t in timeline %}
+
+      <div class="row mt-2">
+      <div class="col-12 col-xl-12">
+        <div class="card h-100">
+          <div class="card-header pb-0 p-3">
+            <h5 class="mb-0"><strong>{{t.screen_name}}<strong></h5>
+          </div>
+          <div class="card-body p-3">
+            <ul class="list-group">
+              
+              <li class="list-group-item border-0 d-flex align-items-center px-0 mb-2">
+                {% if t.image %}
+                <div class="avatar me-3">
+                  <img src="{{ ASSETS_ROOT }}/img/profile_images/{{t.screen_name}}/profile_photo.png" alt="kal" class="border-radius-lg shadow">
+                </div>
+                {% else %}
+                <div class="avatar me-3">
+                  <img src="{{ ASSETS_ROOT }}/img/profile_images/pp.png" alt="kal" class="border-radius-lg shadow">
+                </div>
+                {% endif %}
+                <div class="d-flex align-items-start flex-column justify-content-center">
+                  <h6 class="mb-0 text-sm">{{t.name}}</h6>
+                  <p class="mb-0 text-xs">{{t.date_time}}</p>
+                  
+                </div>
+                
+                
+                <!-- <p>
+                <form action ="{% url 'delete_thought' %}" class="del" method="POST">
+                  {% csrf_token %}
+                  <input id='btn1' class="btn btn-link " value="Delete Thought" type="submit" name="Login" />
+              </form>
+              </p> -->
+                <!-- <a class="btn btn-link pe-3 ps-0 mb-0 ms-auto" href="javascript:;">Delete Thought</a> -->
+                
+              </li>
+              <div class="card-body pt-4 p-3">
+                <li class="list-group-item border-0 d-flex p-4 mb-2 bg-gray-100 border-radius-lg">
+                  <div class="d-flex flex-column">
+                    <span class="text-xs"><span class="text-dark ms-sm-2 font-weight-bold" id="model-name">"{{t.thought}}"</span></span>
+                  </div>
+                  {% if auth_user.screen_name == t.screen_name or auth_user.staff%}
+                  <div class="ms-auto text-end">
+                    <form action ="{% url 'delete_thought' %}" class="del" method="POST">
+                      {% csrf_token %}
+                      <input type="hidden" id="deleteid" name="deleteid" value={{t.timeline_id}} />
+                      <button type='submit' class="btn btn-link text-danger text-gradient px-3 mb-0 delete" name="Login"><i class="far fa-trash-alt me-2"></i></button>
+                  </form>
+                    <!-- <a class="btn btn-link text-danger text-gradient px-3 mb-0 delete" href="javascript:;" id="${book.id}"><i class="far fa-trash-alt me-2"></i>Delete</a> -->
+                  </div>
+                  {% endif %}
+                </li>
+              </div>
+              
+            </ul>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    
+    
+
+    {% include "includes/footer.html" %}
+
+  </div>
+
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <form id="form">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Timeline thought</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+          <div class="modal-body">
+              <input id="id" name="id" type="hidden" >
+            <div class="mb-3">
+                <label for="name">Write your thought: </label>
+                <input id="name" class="form-control" name="name">
+            </div>
+              <div id="alert" class="d-none alert alert-danger text-light fw-bold">alert</div>
+          </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <input type="submit" class="btn btn-primary" value="Save changes">
+      </div>
+    </form>
+    </div>
+  </div>
+</div>
+
+{% endif %}
+{% endblock content %}
